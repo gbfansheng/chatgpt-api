@@ -32,6 +32,42 @@ export type ChatGPTAPIOptions = {
   fetch?: FetchFn
 }
 
+export interface ChatCompletionFunctions {
+  /**
+   * The name of the function to be called. Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64.
+   * @type {string}
+   */
+  name: string
+  /**
+   * The description of what the function does.
+   * @type {string}
+   */
+  description?: string
+  /**
+   * The parameters the functions accepts, described as a JSON Schema object. See the [guide](/docs/guides/gpt/function-calling) for examples, and the [JSON Schema reference](https://json-schema.org/understanding-json-schema/) for documentation about the format.
+   * @type {{ [key: string]: any; }}
+   */
+  parameters?: { [key: string]: any }
+}
+
+export interface ChatCompletionRequestMessageTool {
+  type: string
+  function: ChatCompletionFunctions
+}
+
+// export interface CreateChatCompletionRequestFunctionCallOneOf {
+//   /**
+//    * The name of the function to call.
+//    * @type {string}
+//    * @memberof CreateChatCompletionRequestFunctionCallOneOf
+//    */
+//   name: string
+// }
+
+// export type CreateChatCompletionRequestFunctionCall =
+//   | CreateChatCompletionRequestFunctionCallOneOf
+//   | string
+
 export type SendMessageOptions = {
   /** The name of a user in a multi-user chat. */
   name?: string
@@ -45,6 +81,13 @@ export type SendMessageOptions = {
   completionParams?: Partial<
     Omit<openai.CreateChatCompletionRequest, 'messages' | 'n' | 'stream'>
   >
+  /**
+   * A list of tools the model may generate JSON inputs for.
+   * @type {Array<ChatCompletionRequestMessageTool>}
+   * @memberof CreateChatCompletionRequest
+   */
+  tools?: Array<ChatCompletionRequestMessageTool>
+  tool_choice?: string
 }
 
 export type MessageActionType = 'next' | 'variant'
@@ -66,11 +109,17 @@ export interface ChatMessage {
   name?: string
   delta?: string
   detail?: any
-
+  finish_reason?: string
   // relevant for both ChatGPTAPI and ChatGPTUnofficialProxyAPI
   parentMessageId?: string
   // only relevant for ChatGPTUnofficialProxyAPI
   conversationId?: string
+
+  // functionCall?: {
+  //   arguments?: string
+  //   name?: string
+  // }
+  tool_calls?: any
 }
 
 export class ChatGPTError extends Error {
@@ -173,6 +222,8 @@ export type MessageContent = {
 
 export type MessageMetadata = any
 
+// export type FunctionCall = { arguments: string; name: string }
+
 export namespace openai {
   export interface CreateChatCompletionDeltaResponse {
     id: string
@@ -184,6 +235,8 @@ export namespace openai {
         delta: {
           role: Role
           content?: string
+          tool_calls?: any
+          // function_call?: FunctionCall
         }
         index: number
         finish_reason: string | null

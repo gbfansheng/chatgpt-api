@@ -139,7 +139,9 @@ export class ChatGPTAPI {
       timeoutMs,
       onProgress,
       stream = onProgress ? true : false,
-      completionParams
+      completionParams,
+      tools,
+      tool_choice
     } = opts
 
     let { abortSignal } = opts
@@ -167,7 +169,8 @@ export class ChatGPTAPI {
       role: 'assistant',
       id: uuidv4(),
       parentMessageId: messageId,
-      text: ''
+      text: '',
+      finish_reason: ''
     }
 
     const responseP = new Promise<types.ChatMessage>(
@@ -181,7 +184,8 @@ export class ChatGPTAPI {
           max_tokens: maxTokens,
           ...this._completionParams,
           ...completionParams,
-          messages,
+          tools,
+          tool_choice,
           stream
         }
 
@@ -212,6 +216,7 @@ export class ChatGPTAPI {
                   }
 
                   if (response?.choices?.length) {
+                    const choice = response?.choices[0]
                     const delta = response.choices[0].delta
                     result.delta = delta.content
                     if (delta?.content) result.text += delta.content
@@ -220,6 +225,8 @@ export class ChatGPTAPI {
                     if (delta.role) {
                       result.role = delta.role
                     }
+                    result.tool_calls = delta.tool_calls
+                    result.finish_reason = choice?.finish_reason
 
                     onProgress?.(result)
                   }
