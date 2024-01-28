@@ -1,5 +1,5 @@
 {
-  "name": "chatgpt",
+  "name": "lin-chatgpt",
   "version": "5.1.2",
   "description": "Node.js client for the official ChatGPT API.",
   "author": "Travis Fischer <travis@transitivebullsh.it>",
@@ -61,8 +61,8 @@
     "prettier": "^2.8.4",
     "tsup": "^6.6.3",
     "tsx": "^3.12.5",
-    "typedoc": "^0.23.27",
-    "typedoc-plugin-markdown": "^3.13.6",
+    "typedoc": "^0.24.0",
+    "typedoc-plugin-markdown": "^3.17.1",
     "typescript": "^4.9.5"
   },
   "lint-staged": {

@@ -1,4 +1,5 @@
 import Keyv from 'keyv'
+import { FunctionToolCall } from 'openai/resources/beta/threads/runs/steps'
 
 export type Role = 'user' | 'assistant' | 'system'
 
@@ -102,6 +103,17 @@ export type SendMessageBrowserOptions = {
   abortSignal?: AbortSignal
 }
 
+export interface ChatMessageToolCall {
+  index: number
+  id?: string
+  type?: string
+  function?: {
+    name: string
+    arguments: string
+    output?: string
+  }
+}
+
 export interface ChatMessage {
   id: string
   text: string
@@ -119,7 +131,7 @@ export interface ChatMessage {
   //   arguments?: string
   //   name?: string
   // }
-  tool_calls?: any
+  tool_calls?: Array<ChatMessageToolCall>
 }
 
 export class ChatGPTError extends Error {

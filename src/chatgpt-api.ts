@@ -184,6 +184,7 @@ export class ChatGPTAPI {
           max_tokens: maxTokens,
           ...this._completionParams,
           ...completionParams,
+          messages,
           tools,
           tool_choice,
           stream
@@ -210,6 +211,7 @@ export class ChatGPTAPI {
                 try {
                   const response: types.openai.CreateChatCompletionDeltaResponse =
                     JSON.parse(data)
+                  console.log(`sendMessage response:\n`, data)
 
                   if (response.id) {
                     result.id = response.id
@@ -222,10 +224,29 @@ export class ChatGPTAPI {
                     if (delta?.content) result.text += delta.content
                     result.detail = response
 
-                    if (delta.role) {
+                    if (delta?.role) {
                       result.role = delta.role
                     }
-                    result.tool_calls = delta.tool_calls
+                    // accumulate tool_calls
+                    if (delta?.tool_calls) {
+                      const toolCall = delta
+                        .tool_calls[0] as types.ChatMessageToolCall
+                      console.log(toolCall)
+                      if (toolCall) {
+                        if (!result.tool_calls) {
+                          result.tool_calls = []
+                        }
+                        const preToolCall = result.tool_calls[toolCall.index]
+                        if (preToolCall) {
+                          // 存在
+                          preToolCall.function.arguments +=
+                            toolCall.function.arguments
+                        } else {
+                          result.tool_calls[toolCall.index] = toolCall
+                        }
+                      }
+                    }
+
                     result.finish_reason = choice?.finish_reason
 
                     onProgress?.(result)
@@ -286,7 +307,7 @@ export class ChatGPTAPI {
             }
 
             result.detail = response
-
+            console.log(result)
             return resolve(result)
           } catch (err) {
             return reject(err)
