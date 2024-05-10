@@ -344,6 +344,14 @@ export class ChatGPTAPI {
     this._apiKey = apiKey
   }
 
+  get apiBaseUrl(): string {
+    return this._apiBaseUrl
+  }
+
+  set apiBaseUrl(apiBaseUrl: string) {
+    this._apiBaseUrl = apiBaseUrl
+  }
+
   protected async _buildMessages(text: string, opts: types.SendMessageOptions) {
     const { systemMessage = this._systemMessage } = opts
     let { parentMessageId } = opts
