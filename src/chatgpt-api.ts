@@ -374,8 +374,7 @@ export class ChatGPTAPI {
       ? messages.concat([
           {
             role: 'user',
-            content: text,
-            name: opts.name
+            content: text
           }
         ])
       : messages
@@ -423,8 +422,7 @@ export class ChatGPTAPI {
       nextMessages = nextMessages.slice(0, systemMessageOffset).concat([
         {
           role: parentMessageRole,
-          content: parentMessage.text,
-          name: parentMessage.name
+          content: parentMessage.text
         },
         ...nextMessages.slice(systemMessageOffset)
       ])
