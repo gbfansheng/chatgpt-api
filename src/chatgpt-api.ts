@@ -68,9 +68,6 @@ export class ChatGPTAPI {
 
     this._completionParams = {
       model: CHATGPT_MODEL,
-      temperature: 0.8,
-      top_p: 1.0,
-      presence_penalty: 1.0,
       ...completionParams
     }
 
